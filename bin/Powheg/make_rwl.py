@@ -53,7 +53,7 @@ fout.write("<weightgroup name='scale_variation' combine='envelope' >\n")
 for m_rensc in m_factor :
   for m_facsc in m_factor :
     fout.write("<weight id='"+str(m_idx)+"'> lhapdf="+str(CentralPDF)+" renscfact="+ \
-               m_rensc+" facscfact="+m_facsc+" </weight>\n")
+               m_rensc+" facscfact="+m_facsc+" width_correction=5 </weight>\n")
     m_idx = m_idx + 1
 		  
 fout.write("</weightgroup>\n")
@@ -148,36 +148,39 @@ elif process == "b_bbar_4l":
                 [2109, 323500, 'NNPDF31_nnlo_as_0119', 1],
                 [2110, 323700, 'NNPDF31_nnlo_as_0122', 1],
                 [2111, 323900, 'NNPDF31_nnlo_as_0124', 1],
-                [3000, 305800, 'NNPDF31_nlo_hessian_pdfas', 1],
-                [5000, 13000, 'CT14nnlo', 1],
-                [5060, 13065, 'CT14nnlo_as_0116', 1],
-                [5070, 13069, 'CT14nnlo_as_0120', 1],
-                [4000, 13100, 'CT14nlo', 1],
-                [4060, 13163, 'CT14nlo_as_0116', 1],
-                [4070, 13167, 'CT14nlo_as_0120', 1],
-                [4080, 13200, 'CT14lo', 1],
-                [6000, 25200, 'MMHT2014nlo68clas118', 1],
-                [7000, 25300, 'MMHT2014nnlo68cl', 1],
-                [7060, 25000, 'MMHT2014lo68cl', 1],
+                [2600, 331600, 'NNPDF40_nnlo_hessian_pdfas', 1],
+                #[3000, 305800, 'NNPDF31_nlo_hessian_pdfas', 1],
+                #[5000, 13000, 'CT14nnlo', 1],
+                #[5060, 13065, 'CT14nnlo_as_0116', 1],
+                #[5070, 13069, 'CT14nnlo_as_0120', 1],
+                #[4000, 13100, 'CT14nlo', 1],
+                #[4060, 13163, 'CT14nlo_as_0116', 1],
+                #[4070, 13167, 'CT14nlo_as_0120', 1],
+                #[4080, 13200, 'CT14lo', 1],
+                [4000, 14000, 'CT18NNLO', 1],
+                [6000, 93300, 'PDF4LHC21_40_pdfas', 1],
+                #[6000, 25200, 'MMHT2014nlo68clas118', 1],
+                #[7000, 25300, 'MMHT2014nnlo68cl', 1],
+                #[7060, 25000, 'MMHT2014lo68cl', 1],
                 [8000, 42780, 'ABMP16als118_5_nnlo', 1],
-                [8500, 90200, 'PDF4LHC15_nlo_100_pdfas', 1],
-                [9000, 91200, 'PDF4LHC15_nnlo_100_pdfas', 1],
-                [10000, 90400, 'PDF4LHC15_nlo_30_pdfas', 1],
-                [11000, 91400, 'PDF4LHC15_nnlo_30_pdfas', 1],
-                [12000, 61100, 'HERAPDF20_NLO_EIG', 1],
-                [12050, 61130, 'HERAPDF20_NLO_VAR', 1],
+                #[8500, 90200, 'PDF4LHC15_nlo_100_pdfas', 1],
+                #[9000, 91200, 'PDF4LHC15_nnlo_100_pdfas', 1],
+                #[10000, 90400, 'PDF4LHC15_nlo_30_pdfas', 1],
+                #[11000, 91400, 'PDF4LHC15_nnlo_30_pdfas', 1],
+                #[12000, 61100, 'HERAPDF20_NLO_EIG', 1],
+                #[12050, 61130, 'HERAPDF20_NLO_VAR', 1],
                 [13000, 61200, 'HERAPDF20_NNLO_EIG', 1],
-                [13050, 61230, 'HERAPDF20_NNLO_VAR', 1],
-                [14000, 13400, 'CT14qed_inc_proton', 1],
+                #[13050, 61230, 'HERAPDF20_NNLO_VAR', 1],
+                #[14000, 13400, 'CT14qed_inc_proton', 1],
             ],
-            "PDF_variation2 , replica" :
-            [
-                [3400, 316200, 'NNPDF31_nnlo_as_0118_mc', 1],
-                [1800, 315000, 'NNPDF31_lo_as_0118', 1],
-                [1850, 315200, 'NNPDF31_lo_as_0130', 1],
-                [15000, 82200, 'LUXqed17_plus_PDF4LHC15_nnlo_100', 1],
-                [16000, 325100, 'NNPDF31_nnlo_as_0118_luxqed', 1],
-            ],
+            #"PDF_variation2 , replica" :
+            #[
+            #    [3400, 316200, 'NNPDF31_nnlo_as_0118_mc', 1],
+            #    [1800, 315000, 'NNPDF31_lo_as_0118', 1],
+            #    [1850, 315200, 'NNPDF31_lo_as_0130', 1],
+            #    [15000, 82200, 'LUXqed17_plus_PDF4LHC15_nnlo_100', 1],
+            #    [16000, 325100, 'NNPDF31_nnlo_as_0118_luxqed', 1],
+            #],
         }
 
 ### sets for Run3 start up 
@@ -369,7 +372,7 @@ for key, pdfsets in sorted(pdf_sets.items()):
     pdf_member_start = pdf[1]
     pdf_member_end = pdf[1] + pdf[3]
     for idx in range(pdf_member_start, pdf_member_end) :
-      fout.write("<weight id='"+str(m_idx)+"'> lhapdf="+str(idx)+" </weight>\n")
+      fout.write("<weight id='"+str(m_idx)+"'> lhapdf="+str(idx)+" width_correction=5 </weight>\n")
       m_idx = m_idx + 1
       pdf_count += 1
   fout.write("</weightgroup>\n")

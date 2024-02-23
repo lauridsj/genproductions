@@ -78,7 +78,9 @@ export POWHEGSRC=$powhegSrc
 
 echo 'D/L POWHEG source...'
 
-if [ $svnRev -eq 0 ]; then
+if [ "$$process" = "b_bbar_4l" ]; then
+  git clone https://gitlab.cern.ch/tjezo/powheg-box-res-bb4l-sl-beta.git POWHEG-BOX
+elif [ $svnRev -eq 0 ]; then
   if [ ! -f $${POWHEGSRC} ]; then
     wget --no-verbose --no-check-certificate http://cms-project-generators.web.cern.ch/cms-project-generators/slc6_amd64_gcc481/powheg/V2.0/src/$${POWHEGSRC} || fail_exit "Failed to get powheg tar ball "
   fi

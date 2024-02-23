@@ -196,6 +196,13 @@ else
 
 fi
 
+if [ "${process}" == "b_bbar_4l" ]; then
+    # fix the virtual weight for bb4l
+    echo "Running fix_virtual_weight.py for bb4l..."
+    python3 ../fix_virtual_weight.py pwgevents.lhe
+    mv pwgevents.lhe pwgevents_unweighted.lhe
+    mv pwgevents_weighted.lhe pwgevents.lhe
+fi
 
 if [ "${process}" == "X0jj" ]; then
     # now run reweighting for X0jj process

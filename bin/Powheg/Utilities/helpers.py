@@ -48,6 +48,7 @@ def runGetSource_patch_1(process) :
 patch -l -p0 -i ${patches_dir}/zz_m4lcut.patch",
     "b_bbar_4l" : "cd POWHEG-BOX\n \
 patch -l -p0 -i ${patches_dir}/res_openloops_long_install_dir.patch\n \
+patch -l -p0 -i ${patches_dir}/b_bbar_4l_rwl_pdf_optimization.patch\n \
 cd ..",
     "ttb_NLO_dec" : "patch -l -p0 -i ${patches_dir}/pwhg_ttb_NLO_dec_gen_radiation_hook.patch",
     "Zj" : "if [ ${forMiNNLO} -eq 1 ]; then\n \
@@ -102,7 +103,7 @@ cd HJMiNNLO\n \
 patch -l -p0 -i ${WORKDIR}/patches/vj_minnlo_rwl_pdf_optimization.patch\n \
 patch -l -p0 -i ${WORKDIR}/patches/vj_minnlo_compiler_flags.patch\n \
 fi",
-    "b_bbar_4l": "patch -l -p0 -i ${WORKDIR}/patches/b_bbar_4l_sameflavour.patch"
+    "b_bbar_4l": "git apply ${WORKDIR}/patches/b_bbar_4l_dl_sameflavour.patch"
 }.get(process,"")
 
 def runGetSource_patch_3(process) :
