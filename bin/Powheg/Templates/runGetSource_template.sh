@@ -282,6 +282,10 @@ if [ -e $${WORKDIR}/cteq6m ]; then
     cp -p $${WORKDIR}/cteq6m .
 fi 
 
+if [ $${process} == "b_bbar_4l" ]; then
+  cp -p ../fix_virtual_weight.py .
+fi
+
 #rm -f $${WORKDIR}/$${name}/powheg.input
 #cat $${card} | sed -e "s#SEED#$${seed}#g" | sed -e "s#NEVENTS#$${nevt}#g" > powheg.input
 
