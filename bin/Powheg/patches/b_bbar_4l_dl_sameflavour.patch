@@ -1,0 +1,150 @@
+diff --git a/b_bbar_4l/Born.f b/b_bbar_4l/Born.f
+index 7cfd4c5..d88f88c 100644
+--- a/b_bbar_4l/Born.f
++++ b/b_bbar_4l/Born.f
+@@ -143,10 +143,10 @@ c of being implemented.
+       implicit none
+       logical, save :: ini = .true.
+       integer, save :: channel
+-      real * 8, save :: brtau2brmu, brtau2bre, mtau
++      real * 8, save :: brtau2brmu, brtau2bre, brmu2bre, mtau
+       real * 8 powheginput
+       real * 8 randomNumber, random
+-      real * 8, save :: weights(6), weightSum
++      real * 8, save :: weights(9), weightSum
+       integer i
+       external random
+       if (ini) then
+@@ -156,15 +156,24 @@ c of being implemented.
+         if (brtau2brmu < 0) brtau2brmu = 0.999270413
+         brtau2bre = powheginput('#br_tau/br_e')
+         if (brtau2bre < 0) brtau2bre = 0.99926856
++        brmu2bre = brtau2bre / brtau2brmu
+ c       prepare probability partitions
+-        weightSum = 2d0 + 2d0*brtau2brmu + 2d0*brtau2bre
++        if (channel.eq.8) then
++           weightSum = 2d0 + 2d0*brtau2brmu + 2d0*brtau2bre
++     1     + 1d0/brmu2bre + brmu2bre + brtau2brmu*brtau2bre
++        else
++           weightSum = 2d0 + 2d0*brtau2brmu + 2d0*brtau2bre
++        endif
+         weights(1:2) = 1d0
+         weights(3:4) = brtau2brmu
+         weights(5:6) = brtau2bre
+-        do i=2,6
++        weights(7) = 1d0/brmu2bre
++        weights(8) = brmu2bre
++        weights(9) = brtau2brmu*brtau2bre
++        do i=2,9
+            weights(i) = ( weights(i) + weights(i-1) )
+         enddo
+-        do i=1,6
++        do i=1,9
+            weights(i) = weights(i) / weightSum
+         enddo
+         ini = .false.
+@@ -193,6 +202,7 @@ c                     4 ... only e+ nu_e~ tau- nu_tau    ( 11, -12, -15,  16)
+ c                     5 ... only tau- nu_tau  mu+ nu_mu~ (-15,  16,  13, -14)
+ c                     6 ... only tau+ nu_tau~ mu- nu_mu  ( 15, -16, -13,  14)
+ c                     7 ... options 0,1,3,4,5 or 6
++c                     8 ... full dileptonic ttbar including same flavour
+       elseif (channel == 3) then
+         call mu2tau
+ c       the weight also needs modifying, see above
+@@ -227,6 +237,33 @@ c           do nothing
+             call e2tau
+             call flip_flavours
+         end select
++      else if (channel == 8) then
++         do i=1,9
++          if ( randomNumber < weights(i) ) exit
++        enddo
++        select case (i) 
++          case (1) 
++c           do nothing
++          case (2)
++            call flip_flavours
++          case (3)
++            call mu2tau
++          case (4)
++            call mu2tau
++            call flip_flavours
++          case (5)
++            call e2tau
++          case (6)
++            call e2tau
++            call flip_flavours
++          case (7)
++            call mu2e
++          case (8)
++            call e2mu
++          case (9)
++            call e2tau
++            call mu2tau
++        end select
+       else 
+         print*, "finalize_lh: value for channel=",channel,"is not allowed. Exiting!"
+         call exit(-1)
+@@ -304,7 +341,31 @@ c     flip W+ lepton flavours
+         endif
+       enddo
+       end subroutine
++      subroutine e2mu
++      implicit none
++      include 'LesHouches.h'
++      integer iup, sgn
++      do iup = 1, nup
++        if (abs(idup(iup)) == 13) then
++          idup(iup) = sign(11,idup(iup))
++        else if (abs(idup(iup)) == 14) then
++          idup(iup) = sign(12,idup(iup))
++        endif
++      enddo
++      end subroutine
+       end
++      subroutine mu2e
++      implicit none
++      include 'LesHouches.h'
++      integer iup, sgn
++      do iup = 1, nup
++        if (abs(idup(iup)) == 11) then
++          idup(iup) = sign(13,idup(iup))
++        else if (abs(idup(iup)) == 12) then
++          idup(iup) = sign(14,idup(iup))
++        endif
++      enddo
++      end subroutine
+ 
+ 
+       subroutine complete_resonance_colours(iret)
+diff --git a/b_bbar_4l/init_processes.f b/b_bbar_4l/init_processes.f
+index d32dfb7..70980df 100644
+--- a/b_bbar_4l/init_processes.f
++++ b/b_bbar_4l/init_processes.f
+@@ -15,7 +15,7 @@ c      include 'pwhg_physpar.h'
+       logical openloopsreal,openloopsvirtual
+       common/copenloopsreal/openloopsreal,openloopsvirtual
+       integer channel
+-      real * 8 brtau2brmu, brtau2bre
++      real * 8 brtau2brmu, brtau2bre, brmu2bre
+       integer :: width_correction_flg
+       common/width_correction_common/width_correction_flg
+       include 'FourToFiveMatching.h'
+@@ -186,6 +186,7 @@ c      of channel=7
+       if (brtau2brmu < 0) brtau2brmu = 0.999270413
+       brtau2bre = powheginput('#br_tau/br_e')
+       if (brtau2bre < 0) brtau2bre = 0.99926856
++      brmu2bre = brtau2bre / brtau2brmu
+ c        in which case both e-mu+ and e+mu- channels will be generated
+ c        simply by adding e+mu- channel with the same amplitude 
+ c        (by flipping a signs in an already generated event with the 
+@@ -203,6 +204,9 @@ c        probability of 0.5)
+           rad_branching = brtau2bre
+         case (7)
+           rad_branching = 2d0 + 2d0*brtau2brmu + 2d0*brtau2bre
++        case (8)
++          rad_branching = 2d0 + 2d0*brtau2brmu + 2d0*brtau2bre
++     1    + 1d0/brmu2bre + brmu2bre + brtau2brmu*brtau2bre
+       end select
+ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+                 
